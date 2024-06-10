@@ -21,7 +21,7 @@ function LoginPage() {
             }
         } catch (error) {
             console.log(error);
-            setError(error);
+            setError(error.message);
             setTimeout(() => {
                 setError("");
             }, 5000);

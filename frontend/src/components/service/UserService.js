@@ -53,7 +53,7 @@ class UserService {
 
     static async getUserById(userId, token) {
         try {
-            const response = await axios.get(`${UserService.BASE_URL}/adminuser/get-user/${userId}`, {
+            const response = await axios.get(`${UserService.BASE_URL}/admin/get-users/${userId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -66,7 +66,7 @@ class UserService {
 
     static async deleteUser(userId, token) {
         try {
-            const response = await axios.delete(`${UserService.BASE_URL}/adminuser/get-user/${userId}`, {
+            const response = await axios.delete(`${UserService.BASE_URL}/admin/delete/${userId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

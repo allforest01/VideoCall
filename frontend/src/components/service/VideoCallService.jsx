@@ -18,7 +18,7 @@ const VideoChat = ({ userType }) => {
     const [localStream, setLocalStream] = useState(null);
     const [localPeer, setLocalPeer] = useState(null);
     const [localID, setLocalID] = useState('');
-    // const [remoteID, setRemoteID] = useState('');
+    const [remoteID, setRemoteID] = useState('');
     const localVideoRef = useRef();
     const remoteVideoRef = useRef();
     const [profileInfo, setProfileInfo] = useState({});
@@ -52,7 +52,7 @@ const VideoChat = ({ userType }) => {
         }
     };
 
-    useEffect(() => {
+    const initVideoCall = () => {
         const iceServers = {
             iceServers: [
                 {
@@ -75,30 +75,37 @@ const VideoChat = ({ userType }) => {
             .catch(error => {
                 console.error('Error obtaining local stream:', error);
             });
-    }, []);
+    }
+
+    // useEffect(() => {
+    //     initVideoCall()
+    // }, []);
 
     useSubscription(`/user/${localID}/topic/call`, (message) => {
         const callerID = message.body;
-        // setRemoteID(callerID);
+        setRemoteID(callerID);
         handleIncomingCall(callerID);
     });
 
     useSubscription(`/user/${localID}/topic/offer`, (message) => {
         const { offer, fromUser } = JSON.parse(message.body);
-        // setRemoteID(fromUser);
+        setRemoteID(fromUser);
         handleOffer(offer, fromUser);
     });
 
     useSubscription(`/user/${localID}/topic/answer`, (message) => {
         const { answer, fromUser } = JSON.parse(message.body);
-        // setRemoteID(fromUser);
+        setRemoteID(fromUser);
         handleAnswer(answer);
     });
 
     useSubscription(`/user/${localID}/topic/candidate`, (message) => {
         const { candidate, fromUser } = JSON.parse(message.body);
-        // setRemoteID(fromUser);
         handleCandidate(candidate);
+    });
+
+    useSubscription(`/user/${localID}/topic/endCall`, () => {
+        handleEndCall();
     });
 
     const handleIncomingCall = (callerID) => {
@@ -129,9 +136,11 @@ const VideoChat = ({ userType }) => {
             }
         };
 
-        localStream.getTracks().forEach(track => {
-            localPeer.addTrack(track, localStream);
-        });
+        if (localStream) {
+            localStream.getTracks().forEach(track => {
+                localPeer.addTrack(track, localStream);
+            });
+        }
 
         localPeer.createOffer().then(description => {
             localPeer.setLocalDescription(description);
@@ -175,9 +184,11 @@ const VideoChat = ({ userType }) => {
             }
         };
 
-        localStream.getTracks().forEach(track => {
-            localPeer.addTrack(track, localStream);
-        });
+        if (localStream) {
+            localStream.getTracks().forEach(track => {
+                localPeer.addTrack(track, localStream);
+            });
+        }
 
         try {
             await localPeer.setRemoteDescription(new RTCSessionDescription(offer));
@@ -239,7 +250,50 @@ const VideoChat = ({ userType }) => {
         }
     };
 
+    const handleEndCall = () => {
+        console.log('Ending call');
+        if (localPeer) {
+            localPeer.close();
+            setLocalPeer(new RTCPeerConnection({
+                iceServers: [
+                    {
+                        urls: "stun:stun.l.google.com:19302"
+                    }
+                ]
+            }));
+        }
+
+        if (localStream) {
+            localStream.getTracks().forEach(track => track.stop());
+            setLocalStream(null);
+        }
+
+        if (localVideoRef.current) {
+            localVideoRef.current.srcObject = null;
+        }
+
+        if (remoteVideoRef.current) {
+            remoteVideoRef.current.srcObject = null;
+        }
+
+        if (userType === 'CSR') {
+            startCSR();
+        }
+    };
+
+    const endCall = () => {
+        client.publish({
+            destination: "/app/endCall",
+            body: JSON.stringify({
+                toUser: remoteID,
+                fromUser: localID
+            })
+        });
+        handleEndCall();
+    };
+
     const startCSR = () => {
+        initVideoCall();
         console.log('Starting as CSR');
         client.publish({
             destination: "/app/registerCSR",
@@ -250,6 +304,7 @@ const VideoChat = ({ userType }) => {
     };
 
     const callCSR = () => {
+        initVideoCall();
         console.log('Calling CSR');
         client.publish({
             destination: "/app/callCSR",
@@ -279,6 +334,7 @@ const VideoChat = ({ userType }) => {
                     <button id="callCSR" onClick={callCSR}>Call CSR</button>
                 </div>
             )}
+            <button id="endCall" onClick={endCall}>End Call</button>
         </div>
     );
 };

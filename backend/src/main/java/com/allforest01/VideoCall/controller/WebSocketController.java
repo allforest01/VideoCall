@@ -83,4 +83,11 @@ public class WebSocketController {
         simpMessagingTemplate.convertAndSendToUser(toUser, "/topic/candidate", candidateMessage);
         System.out.println("Candidate Sent to user: " + toUser);
     }
+
+    @MessageMapping("/endCall")
+    public void endCall(String endCallMessage) {
+        JSONObject jsonObject = new JSONObject(endCallMessage);
+        String toUser = jsonObject.getString("toUser");
+        simpMessagingTemplate.convertAndSendToUser(toUser, "/topic/endCall", endCallMessage);
+    }
 }

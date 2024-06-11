@@ -52,7 +52,7 @@ const VideoChat = ({ userType }) => {
         }
     };
 
-    const initVideoCall = () => {
+    const initVideoCall = async () => {
         const iceServers = {
             iceServers: [
                 {
@@ -60,22 +60,21 @@ const VideoChat = ({ userType }) => {
                 }
             ]
         };
-
+    
         const peer = new RTCPeerConnection(iceServers);
         setLocalPeer(peer);
-
-        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-            .then(stream => {
-                setLocalStream(stream);
-                if (localVideoRef.current) {
-                    localVideoRef.current.srcObject = stream;
-                }
-                console.log('Local stream obtained');
-            })
-            .catch(error => {
-                console.error('Error obtaining local stream:', error);
-            });
-    }
+    
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            setLocalStream(stream);
+            if (localVideoRef.current) {
+                localVideoRef.current.srcObject = stream;
+            }
+            console.log('Local stream obtained');
+        } catch (error) {
+            console.error('Error obtaining local stream:', error);
+        }
+    };
 
     // useEffect(() => {
     //     initVideoCall()
@@ -111,6 +110,8 @@ const VideoChat = ({ userType }) => {
     const handleIncomingCall = (callerID) => {
         console.log('Handling incoming call from:', callerID);
         localPeer.ontrack = event => {
+            console.log('[handleIncomingCall] remoteVideoRef')
+            console.log(remoteVideoRef)
             if (remoteVideoRef.current) {
                 remoteVideoRef.current.srcObject = event.streams[0];
             }
@@ -136,7 +137,9 @@ const VideoChat = ({ userType }) => {
             }
         };
 
-        if (localStream) {
+        // if (localStream)
+        {
+            console.log('[handleIncomingCall] Adding local stream to peer connection');
             localStream.getTracks().forEach(track => {
                 localPeer.addTrack(track, localStream);
             });
@@ -158,13 +161,32 @@ const VideoChat = ({ userType }) => {
 
     const handleOffer = async (offer, callerID) => {
         console.log('Handling offer:', offer);
+    
+        // Hàm để chờ đến khi localStream có sẵn
+        const waitForLocalStream = () => {
+            return new Promise((resolve) => {
+                const checkStream = () => {
+                    if (localStream) {
+                        resolve();
+                    } else {
+                        setTimeout(checkStream, 100); // Kiểm tra lại sau 100ms
+                    }
+                };
+                checkStream();
+            });
+        };
+    
+        await waitForLocalStream();
+    
         localPeer.ontrack = event => {
+            console.log('[handleOffer] remoteVideoRef')
+            console.log(remoteVideoRef)
             if (remoteVideoRef.current) {
                 remoteVideoRef.current.srcObject = event.streams[0];
             }
             console.log('Remote track received');
         };
-
+    
         localPeer.onicecandidate = event => {
             if (event.candidate) {
                 const candidate = {
@@ -183,13 +205,12 @@ const VideoChat = ({ userType }) => {
                 });
             }
         };
-
-        if (localStream) {
-            localStream.getTracks().forEach(track => {
-                localPeer.addTrack(track, localStream);
-            });
-        }
-
+    
+        console.log('[handleOffer] Adding local stream to peer connection');
+        localStream.getTracks().forEach(track => {
+            localPeer.addTrack(track, localStream);
+        });
+    
         try {
             await localPeer.setRemoteDescription(new RTCSessionDescription(offer));
             const answer = await localPeer.createAnswer();
@@ -203,17 +224,17 @@ const VideoChat = ({ userType }) => {
                     answer
                 })
             });
-
+    
             // Add queued ICE candidates after setting remote description
             iceCandidateQueue.forEach(candidate => {
                 localPeer.addIceCandidate(candidate);
             });
             setIceCandidateQueue([]);
-
+    
         } catch (error) {
             console.error('Error handling offer:', error);
         }
-    };
+    };    
 
     const handleAnswer = async (answer) => {
         console.log('Handling answer:', answer);
@@ -270,11 +291,15 @@ const VideoChat = ({ userType }) => {
 
         if (localVideoRef.current) {
             localVideoRef.current.srcObject = null;
+            // localVideoRef.current = null;
         }
 
         if (remoteVideoRef.current) {
             remoteVideoRef.current.srcObject = null;
+            // remoteVideoRef.current = null;
         }
+
+        setRemoteID('');
 
         if (userType === 'CSR') {
             startCSR();
@@ -303,8 +328,8 @@ const VideoChat = ({ userType }) => {
         });
     };
 
-    const callCSR = () => {
-        initVideoCall();
+    const callCSR = async () => {
+        await initVideoCall();
         console.log('Calling CSR');
         client.publish({
             destination: "/app/callCSR",

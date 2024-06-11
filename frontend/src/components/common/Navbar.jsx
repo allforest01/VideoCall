@@ -15,15 +15,17 @@ function Navbar() {
     };
 
     return (
-        <nav>
-            <ul>
-                {!isAuthenticated && <li><Link to="/">allforest01</Link></li>}
-                {isAuthenticated && <li><Link to="/video-call">Video Call</Link></li>}
-                {isAuthenticated && <li><Link to="/profile">Profile</Link></li>}
-                {isAdmin && <li><Link to="/admin/user-management">User Management</Link></li>}
-                {isAuthenticated && <li><Link to="/" onClick={handleLogout}>Logout</Link></li>}
-            </ul>
-        </nav>
+        <div>
+            <nav>
+                <ul>
+                    {!isAuthenticated && <li><Link to="/">allforest01</Link></li>}
+                    {isAuthenticated && <li><Link to="/profile">Profile</Link></li>}
+                    {isAuthenticated && <li><Link to="/call-center">Call Center</Link></li>}
+                    {isAdmin && <li><Link to="/admin/user-management">User Management</Link></li>}
+                    {isAuthenticated && <li><Link to="/" onClick={handleLogout}>Logout</Link></li>}
+                </ul>
+            </nav>
+        </div>
     );
 }
 

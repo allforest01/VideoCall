@@ -1,5 +1,6 @@
 package com.allforest01.VideoCall.controller;
 
+import com.allforest01.VideoCall.service.VideoCallService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -7,74 +8,79 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
-import java.util.ArrayList;
-
 @Controller
 public class WebSocketController {
 
-    ArrayList<String> users = new ArrayList<String>();
+    @Autowired
+    private VideoCallService videoCallService;
 
     @Autowired
-    SimpMessagingTemplate simpMessagingTemplate;
+    private SimpMessagingTemplate simpMessagingTemplate;
 
     @MessageMapping("/testServer")
     @SendTo("/topic/testServer")
-    public String testServer(String Test){
-        System.out.println("Testing Server");
+    public String testServer(String Test) {
+        System.out.println("Testing Server: " + Test);
         return Test;
     }
 
-    @MessageMapping("/addUser")
-    public void addUser(String user){
-        System.out.println("Adding User");
-        users.add(user);
-        for (String u :users) {
-            System.out.println(u);
-        }
-        System.out.println("User Added Successfully");
+    @MessageMapping("/registerCSR")
+    public void registerCSR(String csrMessage) {
+        JSONObject jsonObject = new JSONObject(csrMessage);
+        String csrID = jsonObject.getString("csrID");
+        System.out.println("Registering CSR: " + csrID);
+        videoCallService.registerCSR(csrID);
+        System.out.println("CSR Registered Successfully: " + csrID);
     }
 
-    @MessageMapping("/call")
-    public void Call(String call){
-        JSONObject jsonObject = new JSONObject(call);
-        System.out.println("Calling to: "+jsonObject.get("callTo")+" Call from "+jsonObject.get("callFrom"));
-        System.out.println("Calling to class: "+jsonObject.get("callTo").getClass()+" Call from class "+jsonObject.get("callFrom").getClass());
-        simpMessagingTemplate.convertAndSendToUser(jsonObject.getString("callTo"),"/topic/call",jsonObject.get("callFrom"));
+    @MessageMapping("/callCSR")
+    public void callCSR(String callMessage) {
+        JSONObject jsonObject = new JSONObject(callMessage);
+        String customerID = jsonObject.getString("callFrom");
+        System.out.println("Call CSR message received from customer: " + customerID);
+
+        String csrID = videoCallService.getNextAvailableCSR();
+        if (csrID != null) {
+            System.out.println("Connecting customer " + customerID + " to CSR " + csrID);
+            simpMessagingTemplate.convertAndSendToUser(csrID, "/topic/call", customerID);
+            simpMessagingTemplate.convertAndSendToUser(customerID, "/topic/connectedCSR", csrID);
+        } else {
+            System.out.println("No available CSRs for customer " + customerID);
+            simpMessagingTemplate.convertAndSendToUser(customerID, "/topic/noCSRAvailable", "No CSR available at the moment. Please try again later.");
+        }
     }
 
     @MessageMapping("/offer")
-    public void Offer(String offer){
-
-        System.out.println("Offer Came");
-        JSONObject jsonObject = new JSONObject(offer);
-        System.out.println(jsonObject.get("offer"));
-        System.out.println(jsonObject.get("toUser"));
-        System.out.println(jsonObject.get("fromUser"));
-        simpMessagingTemplate.convertAndSendToUser(jsonObject.getString("toUser"),"/topic/offer",offer);
-        System.out.println("Offer Sent");
+    public void offer(String offerMessage) {
+        System.out.println("Offer message received: " + offerMessage);
+        JSONObject jsonObject = new JSONObject(offerMessage);
+        String toUser = jsonObject.getString("toUser");
+        System.out.println("Forwarding offer to user: " + toUser);
+        simpMessagingTemplate.convertAndSendToUser(toUser, "/topic/offer", offerMessage);
+        System.out.println("Offer Sent to user: " + toUser);
     }
 
     @MessageMapping("/answer")
-    public void Answer(String answer){
-        System.out.println("Answer came");
-        System.out.println(answer);
-        JSONObject jsonObject = new JSONObject(answer);
-        System.out.println(jsonObject.get("toUser"));
-        System.out.println(jsonObject.get("fromUser"));
-        System.out.println(jsonObject.get("answer"));
-        simpMessagingTemplate.convertAndSendToUser(jsonObject.getString("toUser"),"/topic/answer",answer);
-        System.out.println("Answer Sent");
+    public void answer(String answerMessage) {
+        System.out.println("Answer message received: " + answerMessage);
+        JSONObject jsonObject = new JSONObject(answerMessage);
+        String toUser = jsonObject.getString("toUser");
+        System.out.println("Forwarding answer to user: " + toUser);
+        simpMessagingTemplate.convertAndSendToUser(toUser, "/topic/answer", answerMessage);
+        System.out.println("Answer Sent to user: " + toUser);
     }
 
     @MessageMapping("/candidate")
-    public void Candidate(String candidate){
-        System.out.println("Candidate came");
-        JSONObject jsonObject = new JSONObject(candidate);
-        System.out.println(jsonObject.get("toUser"));
-        System.out.println(jsonObject.get("fromUser"));
-        System.out.println(jsonObject.get("candidate"));
-        simpMessagingTemplate.convertAndSendToUser(jsonObject.getString("toUser"),"/topic/candidate",candidate);
-        System.out.println("Candidate Sent");
+    public void candidate(String candidateMessage) {
+        System.out.println("Candidate message received: " + candidateMessage);
+        JSONObject jsonObject = new JSONObject(candidateMessage);
+        String toUser = jsonObject.getString("toUser");
+        if (toUser == null || toUser.isEmpty()) {
+            System.out.println("Missing toUser in candidate message: " + candidateMessage);
+            return; // Skip sending if toUser is missing
+        }
+        System.out.println("Forwarding candidate to user: " + toUser);
+        simpMessagingTemplate.convertAndSendToUser(toUser, "/topic/candidate", candidateMessage);
+        System.out.println("Candidate Sent to user: " + toUser);
     }
-
 }

@@ -5,10 +5,10 @@ import LoginPage from './components/auth/LoginPage';
 import RegistrationPage from './components/auth/RegistrationPage';
 import FooterComponent from './components/common/Footer';
 import UserService from './components/service/UserService';
-import UpdateUser from './components/userspage/UpdateUser';
-import UserManagementPage from './components/userspage/UserManagementPage';
-import ProfilePage from './components/userspage/ProfilePage';
-import VideoCall from './components/videocall/VideoCall';
+import UpdateUser from './components/layout/UsersPage/UpdateUser';
+import ProfilePage from './components/layout/UsersPage/ProfilePage';
+import UserManagementPage from './components/layout/UsersPage/UserManagementPage';
+import CallCenterPage from './components/layout/CallPage/CallCenterPage';
 
 function App() {
 
@@ -21,7 +21,7 @@ function App() {
             <Route exact path="/" element={<LoginPage />} />
             <Route exact path="/login" element={<LoginPage />} />
             <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/video-call" element={<VideoCall />} />
+            <Route path="/call-center" element={<CallCenterPage />} />
 
             {/* Check if user is authenticated and admin before rendering admin-only routes */}
             {UserService.adminOnly() && (

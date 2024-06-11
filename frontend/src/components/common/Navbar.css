@@ -1,0 +1,15 @@
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #333;
+    color: white;
+    padding: 1rem;
+    z-index: 1000; /* Ensure it's on top of other content */
+}
+
+body {
+    padding-top: 60px; /* Adjust based on the height of your navbar */
+    padding-bottom: 60px; /* Adjust based on the height of your navbar */
+}

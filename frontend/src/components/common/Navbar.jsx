@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import UserService from '../service/UserService';
+import './Navbar.css';
 
 function Navbar() {
     const isAuthenticated = UserService.isAuthenticated();
@@ -17,6 +18,7 @@ function Navbar() {
         <nav>
             <ul>
                 {!isAuthenticated && <li><Link to="/">allforest01</Link></li>}
+                {isAuthenticated && <li><Link to="/video-call">Video Call</Link></li>}
                 {isAuthenticated && <li><Link to="/profile">Profile</Link></li>}
                 {isAdmin && <li><Link to="/admin/user-management">User Management</Link></li>}
                 {isAuthenticated && <li><Link to="/" onClick={handleLogout}>Logout</Link></li>}

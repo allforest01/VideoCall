@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { Grid, Typography, Paper } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { VideoCallContext } from './VideoCallContext';
@@ -27,27 +27,31 @@ const VideoPlayer = () => {
     const {
         localVideoRef,
         remoteVideoRef,
-        startCSR,
-        callCSR,
-        endCall
+        localStream,
+        callAccepted,
+        callEnded,
     } = useContext(VideoCallContext);
 
     const classes = useStyles();
 
     return (
         <Grid container className={classes.gridContainer}>
-            <Paper className={classes.paper}>
-                <Grid item xs={12} md={6}>
-                    <Typography variant="h5" gutterBottom>Name</Typography>
-                    <video playsInline muted ref={localVideoRef} autoPlay className={classes.video} />
-                </Grid>
-            </Paper>
-            <Paper className={classes.paper}>
-                <Grid item xs={12} md={6}>
-                    <Typography variant="h5" gutterBottom>Name</Typography>
-                    <video playsInline muted ref={remoteVideoRef} autoPlay className={classes.video} />
-                </Grid>
-            </Paper>
+            {localStream && (
+                <Paper className={classes.paper}>
+                    <Grid item xs={12} md={6}>
+                        <Typography variant="h5" gutterBottom>Name</Typography>
+                        <video playsInline muted ref={localVideoRef} autoPlay className={classes.video} />
+                    </Grid>
+                </Paper>
+            )}
+            {callAccepted && !callEnded && (
+                <Paper className={classes.paper}>
+                    <Grid item xs={12} md={6}>
+                        <Typography variant="h5" gutterBottom>Name</Typography>
+                        <video playsInline muted ref={remoteVideoRef} autoPlay className={classes.video} />
+                    </Grid>
+                </Paper>
+            )}
         </Grid>
     )
 }

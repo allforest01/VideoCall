@@ -6,6 +6,8 @@ const VideoCallContext = createContext();
 
 const VideoCallProvider = ({ userType, children }) => {
     const client = useStompClient();
+    const [callAccepted, setCallAccepted] = useState(false);
+    const [callEnded, setCallEnded] = useState(false);
     const [localStream, setLocalStream] = useState(null);
     const [localPeer, setLocalPeer] = useState(null);
     const [localID, setLocalID] = useState('');
@@ -67,10 +69,24 @@ const VideoCallProvider = ({ userType, children }) => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
             setLocalStream(stream);
-            if (localVideoRef.current) {
-                localVideoRef.current.srcObject = stream;
-            }
+
+            const waitForLocalVideoRefCurrent = () => {
+                return new Promise((resolve) => {
+                    const checkAvailable = () => {
+                        if (localVideoRef.current) {
+                            resolve();
+                        } else {
+                            setTimeout(checkAvailable, 100);
+                        }
+                    };
+                    checkAvailable();
+                });
+            };
+        
+            await waitForLocalVideoRefCurrent();
+            localVideoRef.current.srcObject = stream;
             console.log('Local stream obtained');
+
         } catch (error) {
             console.error('Error obtaining local stream:', error);
         }
@@ -159,14 +175,13 @@ const VideoCallProvider = ({ userType, children }) => {
     const handleOffer = async (offer, callerID) => {
         console.log('Handling offer:', offer);
     
-        // Hàm để chờ đến khi localStream có sẵn
         const waitForLocalStream = () => {
             return new Promise((resolve) => {
                 const checkStream = () => {
                     if (localStream) {
                         resolve();
                     } else {
-                        setTimeout(checkStream, 100); // Kiểm tra lại sau 100ms
+                        setTimeout(checkStream, 100);
                     }
                 };
                 checkStream();
@@ -338,6 +353,9 @@ const VideoCallProvider = ({ userType, children }) => {
         <VideoCallContext.Provider value={{
             localVideoRef,
             remoteVideoRef,
+            localStream,
+            callAccepted,
+            callEnded,
             startCSR,
             callCSR,
             endCall

@@ -51,10 +51,10 @@ function CallCenterPage() {
                             <StyledAppBar position="static" color="inherit">
                                 <Typography variant="h2" align="center">Video Chat</Typography>
                             </StyledAppBar>
-                            <VideoPlayer />
                             <CallOptions userType={userType}>
                                 <CallNotifications />
                             </CallOptions>
+                            <VideoPlayer />
                         </Wrapper>
                     </VideoCallProvider>
                 )}

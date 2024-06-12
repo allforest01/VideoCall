@@ -36,6 +36,7 @@ const StyledPaper = styled(Paper)({
 
 const CallOptions = ({ userType, children }) => {
     const {
+        localStream,
         callAccepted,
         callEnded,
         startCSR,
@@ -43,12 +44,32 @@ const CallOptions = ({ userType, children }) => {
         endCall
     } = useContext(VideoCallContext);
 
+    const toggleVideo = () => {
+        if (localStream) {
+            localStream.getVideoTracks().forEach(track => track.enabled = !track.enabled);
+        }
+    };
+    
+    const toggleAudio = () => {
+        if (localStream) {
+            localStream.getAudioTracks().forEach(track => track.enabled = !track.enabled);
+        }
+    };
+
     return (
         <StyledContainer>
             <StyledPaper elevation={10}>
                 <StyledForm noValidate autoComplete="off">
                     <StyledGridContainer container>
                         <Grid item xs={12} md={6}>
+                            <StyledPadding>
+                                {localStream && (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                        <Button variant="contained" color="primary" onClick={toggleVideo}>Toggle Video</Button>
+                                        <Button variant="contained" color="primary" onClick={toggleAudio}>Toggle Audio</Button>
+                                    </div>
+                                )}
+                            </StyledPadding>
                             <StyledPadding>
                                 {callAccepted && !callEnded ? (
                                     <Button
@@ -74,10 +95,12 @@ const CallOptions = ({ userType, children }) => {
                                     )
                                 )}
                             </StyledPadding>
+                            <StyledPadding>
+                                {children}
+                            </StyledPadding>
                         </Grid>
                     </StyledGridContainer>
                 </StyledForm>
-                {children}
             </StyledPaper>
         </StyledContainer>
     );

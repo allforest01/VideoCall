@@ -63,7 +63,7 @@ const CallOptions = ({ userType, children }) => {
                     <StyledGridContainer container>
                         <Grid item xs={12} md={6}>
                             <StyledPadding>
-                                {localStream && (
+                                {localStream && callAccepted && !callEnded && (
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                         <Button variant="contained" color="primary" onClick={toggleVideo}>Toggle Video</Button>
                                         <Button variant="contained" color="primary" onClick={toggleAudio}>Toggle Audio</Button>

@@ -100,6 +100,14 @@ const VideoCallProvider = ({ userType, children }) => {
         // handleIncomingCall(callerID);
     });
 
+    useSubscription(`/user/${localID}/topic/noCSRAvailable`, (message) => {
+        handleNoCSRAvailable();
+    });
+
+    useSubscription(`/user/${localID}/topic/connectedCSR`, (message) => {
+        handleConnectedCSR();
+    });
+
     useSubscription(`/user/${localID}/topic/offer`, (message) => {
         const { offer, fromUser } = JSON.parse(message.body);
         setRemoteID(fromUser);
@@ -192,6 +200,15 @@ const VideoCallProvider = ({ userType, children }) => {
             });
         });
     };
+
+    const handleNoCSRAvailable = () => {
+        alert("No CSR available at the moment. Please try again later.");
+        handleEndCall();
+    };
+
+    const handleConnectedCSR = () => {
+        initVideoCall();
+    }
 
     const handleOffer = async (offer, callerID) => {
         setCallAccepted(true);
@@ -364,7 +381,6 @@ const VideoCallProvider = ({ userType, children }) => {
     };
 
     const callCSR = async () => {
-        await initVideoCall();
         console.log('Calling CSR');
         client.publish({
             destination: "/app/callCSR",

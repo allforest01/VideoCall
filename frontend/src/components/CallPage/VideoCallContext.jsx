@@ -6,6 +6,7 @@ const VideoCallContext = createContext();
 
 const VideoCallProvider = ({ userType, children }) => {
     const client = useStompClient();
+    const [callReceived, setCallReceived] = useState(false);
     const [callAccepted, setCallAccepted] = useState(false);
     const [callEnded, setCallEnded] = useState(false);
     const [localStream, setLocalStream] = useState(null);
@@ -95,6 +96,7 @@ const VideoCallProvider = ({ userType, children }) => {
     useSubscription(`/user/${localID}/topic/call`, (message) => {
         const callerID = message.body;
         setRemoteID(callerID);
+        setCallReceived(true);
         handleIncomingCall(callerID);
     });
 
@@ -121,6 +123,8 @@ const VideoCallProvider = ({ userType, children }) => {
     });
 
     const handleIncomingCall = (callerID) => {
+        setCallAccepted(true);
+
         console.log('Handling incoming call from:', callerID);
         localPeer.ontrack = event => {
             console.log('[handleIncomingCall] remoteVideoRef')
@@ -173,6 +177,8 @@ const VideoCallProvider = ({ userType, children }) => {
     };
 
     const handleOffer = async (offer, callerID) => {
+        setCallAccepted(true);
+
         console.log('Handling offer:', offer);
     
         const waitForLocalStream = () => {
@@ -284,6 +290,8 @@ const VideoCallProvider = ({ userType, children }) => {
     };
 
     const handleEndCall = () => {
+        setCallEnded(true);
+
         console.log('Ending call');
         if (localPeer) {
             localPeer.close();
@@ -311,9 +319,9 @@ const VideoCallProvider = ({ userType, children }) => {
 
         setRemoteID('');
 
-        if (userType === 'CSR') {
-            startCSR();
-        }
+        // if (userType === 'CSR') {
+        //     startCSR();
+        // }
     };
 
     const endCall = () => {
@@ -354,11 +362,13 @@ const VideoCallProvider = ({ userType, children }) => {
             localVideoRef,
             remoteVideoRef,
             localStream,
+            callReceived,
             callAccepted,
             callEnded,
             startCSR,
             callCSR,
-            endCall
+            endCall,
+            handleIncomingCall
         }}>
             {children}
         </VideoCallContext.Provider>

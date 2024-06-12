@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Typography, AppBar } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@mui/material/Typography';
+import AppBar from '@mui/material/AppBar';
+import { styled } from '@mui/system';
 import { StompSessionProvider } from 'react-stomp-hooks';
 
 import { VideoCallProvider } from './VideoCallContext';
@@ -12,35 +13,28 @@ import CallOptions from './CallOptions';
 
 const SERVER_STOMP_URL = 'http://localhost:8443/websocket';
 
-const useStyles = makeStyles((theme) => ({
-    appBar: {
-        borderRadius: 15,
-        margin: "30px 100px",
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        width: "600px",
-        border: "2px solid black",
-
-        [theme.breakpoints.down("xs")]: {
-            width: "90%",
-        },
-    },
-    image: {
-        marginLeft: "15px",
-    },
-    wrapper: {
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        width: "100%",
+const StyledAppBar = styled(AppBar)(({ theme }) => ({
+    borderRadius: 15,
+    margin: "30px 100px",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "600px",
+    border: "2px solid black",
+    [theme.breakpoints.down("xs")]: {
+        width: "90%",
     },
 }));
 
-function CallCenterPage() {
-    const classes = useStyles();
+const Wrapper = styled('div')({
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    width: "100%",
+});
 
+function CallCenterPage() {
     const [userType, setUserType] = useState(null);
 
     const startService = (type) => {
@@ -59,15 +53,15 @@ function CallCenterPage() {
                 ) : (
                     <VideoCallProvider userType={userType}>
                         <VideoCallService userType={userType} />
-                        <div className={classes.wrapper}>
-                            <AppBar className={classes.appBar} position="static" color="inherit">
+                        <Wrapper>
+                            <StyledAppBar position="static" color="inherit">
                                 <Typography variant="h2" align="center">Video Chat</Typography>
-                            </AppBar>
+                            </StyledAppBar>
                             <VideoPlayer />
-                            <CallOptions>
+                            <CallOptions userType={userType}>
                                 <CallNotifications />
                             </CallOptions>
-                        </div>
+                        </Wrapper>
                     </VideoCallProvider>
                 )}
             </StompSessionProvider>

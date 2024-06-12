@@ -1,26 +1,28 @@
-import React, { useContext, useEffect } from 'react'
-import { Grid, Typography, Paper } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import React, { useContext } from 'react';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import Paper from '@mui/material/Paper';
+import { styled } from '@mui/system';
 import { VideoCallContext } from './VideoCallContext';
 
-const useStyles = makeStyles((theme) => ({
-    video: {
-        width: "550px",
-        [theme.breakpoints.down("xs")]: {
-            width: "300px",
-        },
+const StyledVideo = styled('video')(({ theme }) => ({
+    width: '550px',
+    [theme.breakpoints.down('xs')]: {
+        width: '300px',
     },
-    gridContainer: {
-        justifyContent: "center",
-        [theme.breakpoints.down("xs")]: {
-            flexDirection: "column",
-        },
+}));
+
+const StyledGridContainer = styled(Grid)(({ theme }) => ({
+    justifyContent: 'center',
+    [theme.breakpoints.down('xs')]: {
+        flexDirection: 'column',
     },
-    paper: {
-        padding: "10px",
-        border: "2px solid black",
-        margin: "10px",
-    },
+}));
+
+const StyledPaper = styled(Paper)(({ theme }) => ({
+    padding: '10px',
+    border: '2px solid black',
+    margin: '10px',
 }));
 
 const VideoPlayer = () => {
@@ -32,28 +34,26 @@ const VideoPlayer = () => {
         callEnded,
     } = useContext(VideoCallContext);
 
-    const classes = useStyles();
-
     return (
-        <Grid container className={classes.gridContainer}>
+        <StyledGridContainer container>
             {localStream && (
-                <Paper className={classes.paper}>
+                <StyledPaper>
                     <Grid item xs={12} md={6}>
                         <Typography variant="h5" gutterBottom>Name</Typography>
-                        <video playsInline muted ref={localVideoRef} autoPlay className={classes.video} />
+                        <StyledVideo playsInline muted ref={localVideoRef} autoPlay />
                     </Grid>
-                </Paper>
+                </StyledPaper>
             )}
             {callAccepted && !callEnded && (
-                <Paper className={classes.paper}>
+                <StyledPaper>
                     <Grid item xs={12} md={6}>
                         <Typography variant="h5" gutterBottom>Name</Typography>
-                        <video playsInline muted ref={remoteVideoRef} autoPlay className={classes.video} />
+                        <StyledVideo playsInline ref={remoteVideoRef} autoPlay />
                     </Grid>
-                </Paper>
+                </StyledPaper>
             )}
-        </Grid>
-    )
-}
+        </StyledGridContainer>
+    );
+};
 
 export default VideoPlayer;

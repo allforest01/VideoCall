@@ -335,8 +335,8 @@ const VideoCallProvider = ({ userType, children }) => {
         handleEndCall();
     };
 
-    const startCSR = () => {
-        initVideoCall();
+    const startCSR = async () => {
+        await initVideoCall();
         console.log('Starting as CSR');
         client.publish({
             destination: "/app/registerCSR",

@@ -1,14 +1,14 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Navbar from './components/common/Navbar';
-import LoginPage from './components/auth/LoginPage';
-import RegistrationPage from './components/auth/RegistrationPage';
-import FooterComponent from './components/common/Footer';
-import UserService from './components/service/UserService';
-import UpdateUser from './components/layout/UsersPage/UpdateUser';
-import ProfilePage from './components/layout/UsersPage/ProfilePage';
-import UserManagementPage from './components/layout/UsersPage/UserManagementPage';
-import CallCenterPage from './components/layout/CallPage/CallCenterPage';
+import Navbar from './components/Common/Navbar';
+import LoginPage from './components/Authentication/LoginPage';
+import RegistrationPage from './components/Authentication/RegistrationPage';
+import FooterComponent from './components/Common/Footer';
+import UserService from './components/UsersPage/UserService';
+import UpdateUser from './components/UsersPage/UpdateUser';
+import ProfilePage from './components/UsersPage/ProfilePage';
+import UserManagementPage from './components/UsersPage/UserManagementPage';
+import CallCenterPage from './components/CallPage/CallCenterPage';
 
 function App() {
 

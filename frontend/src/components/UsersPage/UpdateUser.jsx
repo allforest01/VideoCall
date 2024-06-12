@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import UserService from '../../service/UserService';
+import UserService from './UserService';
 import { Link } from 'react-router-dom';
 
 function ProfilePage() {
@@ -13,8 +13,7 @@ function ProfilePage() {
         try {
             const token = localStorage.getItem('token'); // Retrieve the token from localStorage
             const response = await UserService.getYourProfile(token);
-            console.log(response);
-            setProfileInfo(response.users);
+            setProfileInfo(response.ourUsers);
         } catch (error) {
             console.error('Error fetching profile information:', error);
         }

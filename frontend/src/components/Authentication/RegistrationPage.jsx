@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import UserService from '../service/UserService';
+import UserService from '../UsersPage/UserService';
 import { useNavigate } from 'react-router-dom';
 
 function RegistrationPage() {

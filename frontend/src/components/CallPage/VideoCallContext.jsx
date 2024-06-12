@@ -1,19 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { StompSessionProvider, useStompClient, useSubscription } from 'react-stomp-hooks';
-import UserService from './UserService';
+import React, { createContext, useState, useRef, useEffect } from 'react';
+import { useStompClient, useSubscription } from 'react-stomp-hooks';
+import UserService from '../UsersPage/UserService';
 
-const SERVER_STOMP_URL = 'http://localhost:8443/websocket';
+const VideoCallContext = createContext();
 
-const hashEmailToID = async (email) => {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(email);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    return hashHex;
-};
-
-const VideoChat = ({ userType }) => {
+const VideoCallProvider = ({ userType, children }) => {
     const client = useStompClient();
     const [localStream, setLocalStream] = useState(null);
     const [localPeer, setLocalPeer] = useState(null);
@@ -24,9 +15,14 @@ const VideoChat = ({ userType }) => {
     const [profileInfo, setProfileInfo] = useState({});
     const [iceCandidateQueue, setIceCandidateQueue] = useState([]);
 
-    useEffect(() => {
-        fetchProfileInfo();
-    }, []);
+    const hashEmailToID = async (email) => {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(email);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        return hashHex;
+    };
 
     useEffect(() => {
         const getHashedEmail = async () => {
@@ -52,6 +48,10 @@ const VideoChat = ({ userType }) => {
         }
     };
 
+    useEffect(() => {
+        fetchProfileInfo();
+    }, []);
+
     const initVideoCall = async () => {
         const iceServers = {
             iceServers: [
@@ -76,10 +76,6 @@ const VideoChat = ({ userType }) => {
         }
     };
 
-    // useEffect(() => {
-    //     initVideoCall()
-    // }, []);
-
     useSubscription(`/user/${localID}/topic/call`, (message) => {
         const callerID = message.body;
         setRemoteID(callerID);
@@ -100,6 +96,7 @@ const VideoChat = ({ userType }) => {
 
     useSubscription(`/user/${localID}/topic/candidate`, (message) => {
         const { candidate, fromUser } = JSON.parse(message.body);
+        setRemoteID(fromUser);
         handleCandidate(candidate);
     });
 
@@ -137,7 +134,7 @@ const VideoChat = ({ userType }) => {
             }
         };
 
-        // if (localStream)
+        if (localStream)
         {
             console.log('[handleIncomingCall] Adding local stream to peer connection');
             localStream.getTracks().forEach(track => {
@@ -291,12 +288,10 @@ const VideoChat = ({ userType }) => {
 
         if (localVideoRef.current) {
             localVideoRef.current.srcObject = null;
-            // localVideoRef.current = null;
         }
 
         if (remoteVideoRef.current) {
             remoteVideoRef.current.srcObject = null;
-            // remoteVideoRef.current = null;
         }
 
         setRemoteID('');
@@ -340,34 +335,16 @@ const VideoChat = ({ userType }) => {
     };
 
     return (
-        <div>
-            <style>
-                {`
-                    .mirrored-video {
-                        transform: scaleX(-1);
-                    }
-                `}
-            </style>
-            <div>
-                <video id="localVideo" ref={localVideoRef} autoPlay muted className="mirrored-video"></video>
-                <video id="remoteVideo" ref={remoteVideoRef} autoPlay className="mirrored-video"></video>
-            </div>
-            {userType === 'CSR' ? (
-                <button id="startCSR" onClick={startCSR}>Start as CSR</button>
-            ) : (
-                <div>
-                    <button id="callCSR" onClick={callCSR}>Call CSR</button>
-                </div>
-            )}
-            <button id="endCall" onClick={endCall}>End Call</button>
-        </div>
+        <VideoCallContext.Provider value={{
+            localVideoRef,
+            remoteVideoRef,
+            startCSR,
+            callCSR,
+            endCall
+        }}>
+            {children}
+        </VideoCallContext.Provider>
     );
-};
+}
 
-const VideoCallService = ({ userType }) => (
-    <StompSessionProvider url={SERVER_STOMP_URL}>
-        <VideoChat userType={userType} />
-    </StompSessionProvider>
-);
-
-export default VideoCallService;
+export { VideoCallProvider, VideoCallContext };

@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import { useNavigate } from "react-router-dom";
-import UserService from "../service/UserService";
+import UserService from "../UsersPage/UserService";
 
 function LoginPage() {
     const [email, setEmail] = useState("");

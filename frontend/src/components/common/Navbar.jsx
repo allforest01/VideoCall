@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import UserService from '../service/UserService';
+import UserService from '../UsersPage/UserService';
 import './Navbar.css';
 
 function Navbar() {

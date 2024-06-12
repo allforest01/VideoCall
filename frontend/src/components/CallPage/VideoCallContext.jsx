@@ -97,7 +97,7 @@ const VideoCallProvider = ({ userType, children }) => {
         const callerID = message.body;
         setRemoteID(callerID);
         setCallReceived(true);
-        handleIncomingCall(callerID);
+        // handleIncomingCall(callerID);
     });
 
     useSubscription(`/user/${localID}/topic/offer`, (message) => {
@@ -122,10 +122,27 @@ const VideoCallProvider = ({ userType, children }) => {
         handleEndCall();
     });
 
-    const handleIncomingCall = (callerID) => {
+    const handleIncomingCall = async () => {
+
+        const waitForRemoteID = () => {
+            return new Promise((resolve) => {
+                const checkAvailable = () => {
+                    if (remoteID) {
+                        resolve();
+                    } else {
+                        setTimeout(checkAvailable, 100);
+                    }
+                };
+                checkAvailable();
+            });
+        };
+    
+        await waitForRemoteID();
+
+        setCallReceived(false);
         setCallAccepted(true);
 
-        console.log('Handling incoming call from:', callerID);
+        console.log('Handling incoming call from:', remoteID);
         localPeer.ontrack = event => {
             console.log('[handleIncomingCall] remoteVideoRef')
             console.log(remoteVideoRef)
@@ -142,11 +159,11 @@ const VideoCallProvider = ({ userType, children }) => {
                     label: event.candidate.sdpMLineIndex,
                     id: event.candidate.candidate
                 };
-                console.log('Sending ICE candidate', { toUser: callerID, fromUser: localID, candidate });
+                console.log('Sending ICE candidate', { toUser: remoteID, fromUser: localID, candidate });
                 client.publish({
                     destination: "/app/candidate",
                     body: JSON.stringify({
-                        toUser: callerID,
+                        toUser: remoteID,
                         fromUser: localID,
                         candidate
                     })
@@ -164,11 +181,11 @@ const VideoCallProvider = ({ userType, children }) => {
 
         localPeer.createOffer().then(description => {
             localPeer.setLocalDescription(description);
-            console.log('Sending offer', { toUser: callerID, fromUser: localID, offer: description });
+            console.log('Sending offer', { toUser: remoteID, fromUser: localID, offer: description });
             client.publish({
                 destination: "/app/offer",
                 body: JSON.stringify({
-                    toUser: callerID,
+                    toUser: remoteID,
                     fromUser: localID,
                     offer: description
                 })

@@ -39,7 +39,6 @@ function CallCenterPage() {
 
     return (
         <div className="call-center-page">
-            <h2>Call Center Page</h2>
             <StompSessionProvider url={SERVER_STOMP_URL}>
                 {!userType ? (
                     <div>

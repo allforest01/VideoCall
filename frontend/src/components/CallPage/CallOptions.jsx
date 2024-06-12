@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Button, Grid, Typography, Container, Paper } from '@mui/material';
+import { Button, Grid, Container, Paper } from '@mui/material';
 import { styled } from '@mui/system';
 import { Phone, Queue, PhoneDisabled } from '@mui/icons-material';
 import { VideoCallContext } from './VideoCallContext';
@@ -50,47 +50,25 @@ const CallOptions = ({ userType, children }) => {
                     <StyledGridContainer container>
                         <Grid item xs={12} md={6}>
                             <StyledPadding>
-                                <Typography gutterBottom variant="h6">
-                                    Account Info
-                                </Typography>
-                            </StyledPadding>
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <StyledPadding>
-                                <Typography gutterBottom variant="h6">
-                                    Make a call
-                                </Typography>
                                 {callAccepted && !callEnded ? (
                                     <Button
-                                        variant="contained"
-                                        color="secondary"
-                                        startIcon={
-                                            <PhoneDisabled fontSize="large" />
-                                        }
-                                        fullWidth
-                                        onClick={endCall}
-                                    >
+                                        variant="contained" color="secondary"
+                                        startIcon={<PhoneDisabled fontSize="large" />} fullWidth
+                                        onClick={() => endCall()}>
                                         Hang Up
                                     </Button>
                                 ) : (
                                     userType === 'CSR' ? (
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            startIcon={<Queue fontSize="large" />}
-                                            fullWidth
-                                            onClick={() => startCSR()}
-                                        >
+                                        <Button variant="contained" color="primary"
+                                            startIcon={<Queue fontSize="large" />} fullWidth
+                                            onClick={() => startCSR()}>
                                             Join Queue
                                         </Button>
                                     ) : (
                                         <Button
-                                            variant="contained"
-                                            color="primary"
-                                            startIcon={<Phone fontSize="large" />}
-                                            fullWidth
-                                            onClick={() => callCSR()}
-                                        >
+                                            variant="contained" color="primary"
+                                            startIcon={<Phone fontSize="large" />} fullWidth
+                                            onClick={() => callCSR()}>
                                             Call CSR
                                         </Button>
                                     )

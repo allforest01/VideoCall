@@ -1,15 +1,11 @@
 import React, { useState } from 'react';
-import Typography from '@mui/material/Typography';
-import AppBar from '@mui/material/AppBar';
+import { Typography, AppBar } from '@mui/material';
 import { styled } from '@mui/system';
 import { StompSessionProvider } from 'react-stomp-hooks';
-
 import { VideoCallProvider } from './VideoCallContext';
-import VideoCallService from './VideoCallService';
-
 import VideoPlayer from './VideoPlayer';
-import CallNotifications from './CallNotifications';
 import CallOptions from './CallOptions';
+import CallNotifications from './CallNotifications';
 
 const SERVER_STOMP_URL = 'http://localhost:8443/websocket';
 
@@ -52,7 +48,6 @@ function CallCenterPage() {
                     </div>
                 ) : (
                     <VideoCallProvider userType={userType}>
-                        <VideoCallService userType={userType} />
                         <Wrapper>
                             <StyledAppBar position="static" color="inherit">
                                 <Typography variant="h2" align="center">Video Chat</Typography>

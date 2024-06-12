@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import UserService from './UserService';
+import UserService from '../UsersPage/UserService';
 import { Link } from 'react-router-dom';
 
 function ProfilePage() {

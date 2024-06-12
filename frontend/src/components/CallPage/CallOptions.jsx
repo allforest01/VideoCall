@@ -1,12 +1,7 @@
 import React, { useContext } from 'react';
-import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import Paper from '@mui/material/Paper';
+import { Button, Grid, Typography, Container, Paper } from '@mui/material';
 import { styled } from '@mui/system';
-import Phone from '@mui/icons-material/Phone';
-import PhoneDisabled from '@mui/icons-material/PhoneDisabled';
+import { Phone, Queue, PhoneDisabled } from '@mui/icons-material';
 import { VideoCallContext } from './VideoCallContext';
 
 const StyledForm = styled("form")({
@@ -43,6 +38,7 @@ const CallOptions = ({ userType, children }) => {
     const {
         callAccepted,
         callEnded,
+        startCSR,
         callCSR,
         endCall
     } = useContext(VideoCallContext);
@@ -76,16 +72,28 @@ const CallOptions = ({ userType, children }) => {
                                     >
                                         Hang Up
                                     </Button>
-                                ) : userType !== 'CSR' && (
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        startIcon={<Phone fontSize="large" />}
-                                        fullWidth
-                                        onClick={() => callCSR()}
-                                    >
-                                        Call
-                                    </Button>
+                                ) : (
+                                    userType === 'CSR' ? (
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            startIcon={<Queue fontSize="large" />}
+                                            fullWidth
+                                            onClick={() => startCSR()}
+                                        >
+                                            Join Queue
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            startIcon={<Phone fontSize="large" />}
+                                            fullWidth
+                                            onClick={() => callCSR()}
+                                        >
+                                            Call CSR
+                                        </Button>
+                                    )
                                 )}
                             </StyledPadding>
                         </Grid>

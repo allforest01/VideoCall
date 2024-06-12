@@ -1,7 +1,5 @@
 import React, { useContext } from 'react';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
+import { Grid, Typography, Paper} from '@mui/material';
 import { styled } from '@mui/system';
 import { VideoCallContext } from './VideoCallContext';
 

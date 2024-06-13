@@ -42,9 +42,9 @@ const VideoCallProvider = ({ userType, children }) => {
     const fetchProfileInfo = async () => {
         try {
             const token = localStorage.getItem('token'); // Retrieve the token from localStorage
-            console.log('Fetching profile info with token:', token);
+            console.log('Fetching profile info with token');
             const response = await UserService.getYourProfile(token);
-            console.log('Profile info:', response);
+            // console.log('Profile info:', response);
             setProfileInfo(response.users);
         } catch (error) {
             console.error('Error fetching profile information:', error);
@@ -160,8 +160,7 @@ const VideoCallProvider = ({ userType, children }) => {
 
         console.log('Handling incoming call from:', remoteID);
         localPeer.ontrack = event => {
-            console.log('[handleIncomingCall] remoteVideoRef')
-            console.log(remoteVideoRef)
+            console.log('[handleIncomingCall] remoteVideoRef:', remoteVideoRef)
             if (remoteVideoRef.current) {
                 remoteVideoRef.current.srcObject = event.streams[0];
             }
@@ -175,7 +174,7 @@ const VideoCallProvider = ({ userType, children }) => {
                     label: event.candidate.sdpMLineIndex,
                     id: event.candidate.candidate
                 };
-                console.log('Sending ICE candidate', { toUser: remoteID, fromUser: localID, candidate });
+                console.log('Sending ICE candidate');
                 client.publish({
                     destination: "/app/candidate",
                     body: JSON.stringify({
@@ -197,7 +196,7 @@ const VideoCallProvider = ({ userType, children }) => {
 
         localPeer.createOffer().then(description => {
             localPeer.setLocalDescription(description);
-            console.log('Sending offer', { toUser: remoteID, fromUser: localID, offer: description });
+            console.log('Sending offer');
             client.publish({
                 destination: "/app/offer",
                 body: JSON.stringify({
@@ -228,7 +227,7 @@ const VideoCallProvider = ({ userType, children }) => {
         setCallAccepted(true);
         setCalling(false);
 
-        console.log('Handling offer:', offer);
+        console.log('Handling offer');
     
         const waitForLocalStream = () => {
             return new Promise((resolve) => {
@@ -246,8 +245,7 @@ const VideoCallProvider = ({ userType, children }) => {
         await waitForLocalStream();
     
         localPeer.ontrack = event => {
-            console.log('[handleOffer] remoteVideoRef')
-            console.log(remoteVideoRef)
+            console.log('[handleOffer] remoteVideoRef:', remoteVideoRef)
             if (remoteVideoRef.current) {
                 remoteVideoRef.current.srcObject = event.streams[0];
             }
@@ -261,7 +259,7 @@ const VideoCallProvider = ({ userType, children }) => {
                     label: event.candidate.sdpMLineIndex,
                     id: event.candidate.candidate
                 };
-                console.log('Sending ICE candidate', { toUser: callerID, fromUser: localID, candidate });
+                console.log('Sending ICE candidate');
                 client.publish({
                     destination: "/app/candidate",
                     body: JSON.stringify({
@@ -282,7 +280,7 @@ const VideoCallProvider = ({ userType, children }) => {
             await localPeer.setRemoteDescription(new RTCSessionDescription(offer));
             const answer = await localPeer.createAnswer();
             await localPeer.setLocalDescription(answer);
-            console.log('Sending answer', { toUser: callerID, fromUser: localID, answer });
+            console.log('Sending answer');
             client.publish({
                 destination: "/app/answer",
                 body: JSON.stringify({
@@ -304,7 +302,7 @@ const VideoCallProvider = ({ userType, children }) => {
     };    
 
     const handleAnswer = async (answer) => {
-        console.log('Handling answer:', answer);
+        console.log('Handling answer');
         try {
             await localPeer.setRemoteDescription(new RTCSessionDescription(answer));
 
@@ -320,7 +318,7 @@ const VideoCallProvider = ({ userType, children }) => {
     };
 
     const handleCandidate = (candidate) => {
-        console.log('Handling candidate:', candidate);
+        console.log('Handling candidate');
         try {
             const iceCandidate = new RTCIceCandidate({
                 sdpMLineIndex: candidate.label,
@@ -328,9 +326,9 @@ const VideoCallProvider = ({ userType, children }) => {
             });
             if (localPeer.remoteDescription && localPeer.remoteDescription.type) {
                 localPeer.addIceCandidate(iceCandidate);
-                console.log('Adding ICE candidate:', iceCandidate);
+                console.log('Adding ICE candidate');
             } else {
-                console.log('Queueing ICE candidate:', iceCandidate);
+                console.log('Queueing ICE candidate');
                 setIceCandidateQueue(prev => [...prev, iceCandidate]);
             }
         } catch (error) {
@@ -339,34 +337,33 @@ const VideoCallProvider = ({ userType, children }) => {
     };
 
     const handleEndCall = () => {
-
         setCallReceived(false);
         setCallAccepted(false);
         setJoinedQueue(false);
         setCalling(false);
-
+        setRemoteID('');
+    
         console.log('Ending call');
+    
         if (localPeer) {
             localPeer.close();
             setLocalPeer(null);
         }
-
+    
         if (localStream) {
             localStream.getTracks().forEach(track => track.stop());
             setLocalStream(null);
         }
-
+    
         if (localVideoRef.current) {
             localVideoRef.current.srcObject = null;
-            localVideoRef.current = null;
         }
-
+    
         if (remoteVideoRef.current) {
             remoteVideoRef.current.srcObject = null;
-            remoteVideoRef.current = null;
         }
-
-        setRemoteID('');
+    
+        setIceCandidateQueue([]);
     };
 
     const endCall = () => {

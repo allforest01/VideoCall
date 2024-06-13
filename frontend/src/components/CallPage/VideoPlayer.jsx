@@ -1,28 +1,46 @@
 import React, { useContext } from 'react';
-// import CryptoJS from 'crypto-js';
-import { Grid, Paper } from '@mui/material';
 import { styled } from '@mui/system';
 import { VideoCallContext } from './VideoCallContext';
 
-const StyledVideo = styled('video')(({ theme }) => ({
-    width: '550px',
-    [theme.breakpoints.down('xs')]: {
-        width: '300px',
-    },
-}));
-
-const StyledGridContainer = styled(Grid)(({ theme }) => ({
+const VideoWrapper = styled('div')({
+    width: '80%',
+    height: 'calc(100vh - 100px)',
+    position: 'relative',
+    backgroundColor: '#000',
+    display: 'flex',
     justifyContent: 'center',
-    [theme.breakpoints.down('xs')]: {
-        flexDirection: 'column',
-    },
-}));
+    alignItems: 'center',
+    border: '5px solid #fff', // Add border for visibility
+    borderRadius: '10px',
+    overflow: 'hidden',
+});
 
-const StyledPaper = styled(Paper)(({ theme }) => ({
-    padding: '10px',
-    border: '2px solid black',
-    margin: '10px',
-}));
+const StyledVideo = styled('video')({
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+});
+
+const MiniVideoContainer = styled('div')({
+    width: '150px',
+    height: '100px',
+    position: 'absolute',
+    bottom: '20px',
+    right: '20px',
+    borderRadius: '8px',
+    overflow: 'hidden',
+    zIndex: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+});
+
+const MiniVideo = styled('video')({
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+});
 
 const VideoPlayer = () => {
     const {
@@ -34,22 +52,16 @@ const VideoPlayer = () => {
     } = useContext(VideoCallContext);
 
     return (
-        <StyledGridContainer container>
-            {localStream && (
-                <StyledPaper>
-                    <Grid item xs={12} md={6}>
-                        <StyledVideo playsInline muted ref={localVideoRef} autoPlay />
-                    </Grid>
-                </StyledPaper>
-            )}
+        <VideoWrapper>
             {callAccepted && !callEnded && (
-                <StyledPaper>
-                    <Grid item xs={12} md={6}>
-                        <StyledVideo playsInline ref={remoteVideoRef} autoPlay />
-                    </Grid>
-                </StyledPaper>
+                <StyledVideo playsInline ref={remoteVideoRef} autoPlay />
             )}
-        </StyledGridContainer>
+            {localStream && (
+                <MiniVideoContainer>
+                    <MiniVideo playsInline muted ref={localVideoRef} autoPlay />
+                </MiniVideoContainer>
+            )}
+        </VideoWrapper>
     );
 };
 

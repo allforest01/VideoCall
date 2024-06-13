@@ -9,7 +9,6 @@ const VideoCallProvider = ({ userType, children }) => {
     const client = useStompClient();
     const [callReceived, setCallReceived] = useState(false);
     const [callAccepted, setCallAccepted] = useState(false);
-    // const [callEnded, setCallEnded] = useState(true);
     const [localStream, setLocalStream] = useState(null);
     const [localPeer, setLocalPeer] = useState(null);
     const [localID, setLocalID] = useState('');
@@ -339,18 +338,10 @@ const VideoCallProvider = ({ userType, children }) => {
 
         setCallReceived(false);
         setCallAccepted(false);
-        // setCallEnded(true);
 
         console.log('Ending call');
         if (localPeer) {
             localPeer.close();
-            // setLocalPeer(new RTCPeerConnection({
-            //     iceServers: [
-            //         {
-            //             urls: "stun:stun.l.google.com:19302"
-            //         }
-            //     ]
-            // }));
             setLocalPeer(null);
         }
 
@@ -370,10 +361,6 @@ const VideoCallProvider = ({ userType, children }) => {
         }
 
         setRemoteID('');
-
-        // if (userType === 'CSR') {
-        //     startCSR();
-        // }
     };
 
     const endCall = () => {

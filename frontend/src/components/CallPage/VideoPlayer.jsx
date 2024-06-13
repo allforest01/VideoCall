@@ -24,31 +24,20 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
     margin: '10px',
 }));
 
-// const decryptEmail = (encryptedEmail, key) => {
-//     const bytes = CryptoJS.AES.decrypt(encryptedEmail, key);
-//     return bytes.toString(CryptoJS.enc.Utf8);
-// };
-
 const VideoPlayer = () => {
     const {
         localVideoRef,
         remoteVideoRef,
         localStream,
         callAccepted,
-        callEnded,
-        // localID,
-        // remoteID
+        callEnded
     } = useContext(VideoCallContext);
-
-    // const decodedLocalID = decryptEmail(localID, "S3CR3T");
-    // const decodedRemoteID = decryptEmail(remoteID, "S3CR3T");
 
     return (
         <StyledGridContainer container>
             {localStream && (
                 <StyledPaper>
                     <Grid item xs={12} md={6}>
-                        {/* <Typography variant="h5" gutterBottom>{decodedLocalID}</Typography> */}
                         <StyledVideo playsInline muted ref={localVideoRef} autoPlay />
                     </Grid>
                 </StyledPaper>
@@ -56,7 +45,6 @@ const VideoPlayer = () => {
             {callAccepted && !callEnded && (
                 <StyledPaper>
                     <Grid item xs={12} md={6}>
-                        {/* <Typography variant="h5" gutterBottom>{decodedRemoteID}</Typography> */}
                         <StyledVideo playsInline ref={remoteVideoRef} autoPlay />
                     </Grid>
                 </StyledPaper>

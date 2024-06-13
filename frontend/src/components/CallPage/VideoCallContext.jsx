@@ -19,13 +19,16 @@ const VideoCallProvider = ({ userType, children }) => {
     const [profileInfo, setProfileInfo] = useState({});
     const [iceCandidateQueue, setIceCandidateQueue] = useState([]);
 
-    const encryptEmail = (email, key) => {
-        return CryptoJS.AES.encrypt(email, key).toString();
+    const encryptEmail = (email) => {
+        const salt = CryptoJS.lib.WordArray.random(16).toString(CryptoJS.enc.Hex);
+        const combinedEmail = email + salt;
+        const hash = CryptoJS.SHA256(combinedEmail).toString(CryptoJS.enc.Hex);
+        return hash.substring(0, 16);
     };
 
     useEffect(() => {
         const getEncryptedEmail = async () => {
-            const encryptedEmail = await encryptEmail(profileInfo.email, "S3CR3T");
+            const encryptedEmail = await encryptEmail(profileInfo.email);
             setLocalID(encryptedEmail);
             console.log('Local ID:', encryptedEmail);
         };
@@ -93,7 +96,7 @@ const VideoCallProvider = ({ userType, children }) => {
         const callerID = message.body;
         setRemoteID(callerID);
         setCallReceived(true);
-        // handleIncomingCall(callerID);
+        console.log('Call received from:', callerID);
     });
 
     useSubscription(`/user/${localID}/topic/noCSRAvailable`, (message) => {
@@ -106,6 +109,8 @@ const VideoCallProvider = ({ userType, children }) => {
     });
 
     useSubscription(`/user/${localID}/topic/connectedCSR`, (message) => {
+        const csrID = message.body;
+        console.log('Connected to CSR:', csrID);
         handleConnectedCSR();
     });
 
@@ -204,6 +209,7 @@ const VideoCallProvider = ({ userType, children }) => {
 
     const handleNoCSRAvailable = () => {
         alert("No CSR available at the moment. Please try again later.");
+        console.log("No CSR available at the moment. Please try again later.");
         handleEndCall();
     };
 

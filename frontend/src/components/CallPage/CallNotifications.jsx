@@ -38,7 +38,7 @@ const CallNotifications = () => {
         <StyledDialog
             open={callReceived && !callAccepted}
             onClose={memoizedRejectCall}>
-            <DialogTitle disableTypography>
+            <DialogTitle>
                 <TitleText>Incoming Call</TitleText>
             </DialogTitle>
             <DialogActions>

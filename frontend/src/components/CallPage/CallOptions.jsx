@@ -1,7 +1,7 @@
-import React, { useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { Button, Container, Paper } from '@mui/material';
 import { styled } from '@mui/system';
-import { Phone, Queue, PhoneDisabled, PersonalVideo, KeyboardVoice } from '@mui/icons-material';
+import { Phone, PhoneDisabled, Queue, Logout, Videocam, VideocamOff, Mic, MicOff } from '@mui/icons-material';
 import { VideoCallContext } from './VideoCallContext';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
@@ -18,18 +18,24 @@ const CallOptions = ({ userType, children }) => {
     const {
         localStream,
         callAccepted,
+        joinedQueue,
         startCSR,
         callCSR,
         endCall
     } = useContext(VideoCallContext);
 
+    const [videoEnabled, setVideoEnabled] = useState(true);
+    const [audioEnabled, setAudioEnabled] = useState(true);
+
     const toggleVideo = () => {
+        setVideoEnabled(!videoEnabled);
         if (localStream) {
             localStream.getVideoTracks().forEach(track => track.enabled = !track.enabled);
         }
     };
 
     const toggleAudio = () => {
+        setAudioEnabled(!audioEnabled);
         if (localStream) {
             localStream.getAudioTracks().forEach(track => track.enabled = !track.enabled);
         }
@@ -40,15 +46,29 @@ const CallOptions = ({ userType, children }) => {
             <Paper elevation={10} style={{ padding: '10px', display: 'flex', gap: '10px' }}>
                 {localStream && callAccepted && (
                     <>
-                        <Button variant="contained" color="primary"
-                        startIcon={<PersonalVideo fontSize="large" />} fullWidth
-                        onClick={toggleVideo}>
-                        Toggle</Button>
+                        {videoEnabled ? (
+                            <Button variant="contained" color="primary"
+                            startIcon={<Videocam fontSize="large" />} fullWidth
+                            onClick={toggleVideo}>
+                            Camera</Button>
+                        ) : (
+                            <Button variant="contained" color="secondary"
+                            startIcon={<VideocamOff fontSize="large" />} fullWidth
+                            onClick={toggleVideo}>
+                            Camera</Button>
+                        )}
 
-                        <Button variant="contained" color="primary"
-                        startIcon={<KeyboardVoice fontSize="large" />} fullWidth
-                        onClick={toggleAudio}>
-                        Toggle</Button>
+                        {audioEnabled ? (
+                            <Button variant="contained" color="primary"
+                            startIcon={<Mic fontSize="large" />} fullWidth
+                            onClick={toggleAudio}>
+                            Audio</Button>
+                        ) : (
+                            <Button variant="contained" color="secondary"
+                            startIcon={<MicOff fontSize="large" />} fullWidth
+                            onClick={toggleAudio}>
+                            Audio</Button>
+                        )}
                     </>
                 )}
                 {callAccepted ? (
@@ -60,11 +80,19 @@ const CallOptions = ({ userType, children }) => {
                     </Button>
                 ) : (
                     userType === 'CSR' ? (
-                        <Button variant="contained" color="primary"
-                            startIcon={<Queue fontSize="large" />} fullWidth
-                            onClick={() => startCSR()}>
-                            Join Queue
-                        </Button>
+                        !joinedQueue ? (
+                            <Button variant="contained" color="primary"
+                                startIcon={<Queue fontSize="large" />} fullWidth
+                                onClick={() => startCSR()}>
+                                Join Queue
+                            </Button>
+                        ) : (
+                            <Button variant="contained" color="secondary"
+                                startIcon={<Logout fontSize="large" />} fullWidth
+                                onClick={() => endCall()}>
+                                Leave Queue
+                            </Button>
+                        )
                     ) : (
                         <Button
                             variant="contained" color="primary"

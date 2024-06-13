@@ -9,6 +9,7 @@ const VideoCallProvider = ({ userType, children }) => {
     const client = useStompClient();
     const [callReceived, setCallReceived] = useState(false);
     const [callAccepted, setCallAccepted] = useState(false);
+    const [joinedQueue, setJoinedQueue] = useState(false);
     const [localStream, setLocalStream] = useState(null);
     const [localPeer, setLocalPeer] = useState(null);
     const [localID, setLocalID] = useState('');
@@ -338,6 +339,7 @@ const VideoCallProvider = ({ userType, children }) => {
 
         setCallReceived(false);
         setCallAccepted(false);
+        setJoinedQueue(false);
 
         console.log('Ending call');
         if (localPeer) {
@@ -383,6 +385,7 @@ const VideoCallProvider = ({ userType, children }) => {
                 csrID: localID
             })
         });
+        setJoinedQueue(true);
     };
 
     const callCSR = async () => {
@@ -413,6 +416,7 @@ const VideoCallProvider = ({ userType, children }) => {
             localStream,
             callReceived,
             callAccepted,
+            joinedQueue,
             localID,
             remoteID,
             startCSR,

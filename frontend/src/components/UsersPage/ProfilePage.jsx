@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import UserService from '../UsersPage/UserService';
 import { Link } from 'react-router-dom';
+import UserService from '../UsersPage/UserService';
 
 function ProfilePage() {
     const [profileInfo, setProfileInfo] = useState({});

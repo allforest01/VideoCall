@@ -55,7 +55,7 @@ public class WebSocketController {
         JSONObject jsonObject = new JSONObject(rejectMessage);
         String fromUser = jsonObject.getString("fromUser");
         String toUser = jsonObject.getString("toUser");
-        System.out.println("Call rejected!");
+        System.out.println("Call rejected by: " + fromUser);
         simpMessagingTemplate.convertAndSendToUser(toUser, "/topic/callRejected", fromUser);
         System.out.println("Rejection notification sent to: " + toUser);
     }

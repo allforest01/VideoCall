@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Typography, AppBar } from '@mui/material';
 import { styled } from '@mui/system';
 import { StompSessionProvider } from 'react-stomp-hooks';
 import { VideoCallProvider } from './VideoCallContext';
+import UserService from '../UsersPage/UserService';
 import VideoPlayer from './VideoPlayer';
 import CallOptions from './CallOptions';
 import CallNotifications from './CallNotifications';
@@ -33,19 +34,25 @@ const Wrapper = styled('div')({
 function CallCenterPage() {
     const [userType, setUserType] = useState(null);
 
-    const startService = (type) => {
-        setUserType(type);
+    useEffect(() => {
+        fetchRole();
+    }, []);
+
+    const fetchRole = async () => {
+        try {
+            const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+            const response = await UserService.getYourProfile(token);
+            console.log(response);
+            setUserType(response.users.role);
+        } catch (error) {
+            console.error('Error fetching profile information:', error);
+        }
     };
 
     return (
         <div className="call-center-page">
             <StompSessionProvider url={SERVER_STOMP_URL}>
-                {!userType ? (
-                    <div>
-                        <button onClick={() => startService('CSR')}>Start as Customer Service Representative</button>
-                        <button onClick={() => startService('Customer')}>Start as Customer</button>
-                    </div>
-                ) : (
+                {userType && (
                     <VideoCallProvider userType={userType}>
                         <Wrapper>
                             <StyledAppBar position="static" color="inherit">

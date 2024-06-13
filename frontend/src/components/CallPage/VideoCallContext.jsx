@@ -1,4 +1,5 @@
 import React, { createContext, useState, useRef, useEffect } from 'react';
+import CryptoJS from 'crypto-js';
 import { useStompClient, useSubscription } from 'react-stomp-hooks';
 import UserService from '../UsersPage/UserService';
 
@@ -18,24 +19,19 @@ const VideoCallProvider = ({ userType, children }) => {
     const [profileInfo, setProfileInfo] = useState({});
     const [iceCandidateQueue, setIceCandidateQueue] = useState([]);
 
-    const hashEmailToID = async (email) => {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(email);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        return hashHex;
+    const encryptEmail = (email, key) => {
+        return CryptoJS.AES.encrypt(email, key).toString();
     };
 
     useEffect(() => {
-        const getHashedEmail = async () => {
-            const hashedEmail = await hashEmailToID(profileInfo.email);
-            setLocalID(hashedEmail);
-            console.log('Local ID:', hashedEmail);
+        const getEncryptedEmail = async () => {
+            const encryptedEmail = await encryptEmail(profileInfo.email, "S3CR3T");
+            setLocalID(encryptedEmail);
+            console.log('Local ID:', encryptedEmail);
         };
 
         if (profileInfo.email) {
-            getHashedEmail();
+            getEncryptedEmail();
         }
     }, [profileInfo]);
 
@@ -212,7 +208,7 @@ const VideoCallProvider = ({ userType, children }) => {
     };
 
     const handleCallRejected = (rejectingUser) => {
-        alert(`Call was rejected by ${rejectingUser}`);
+        alert(`Call was rejected!`);
         handleEndCall();
     };
 
@@ -424,6 +420,8 @@ const VideoCallProvider = ({ userType, children }) => {
             localStream,
             callReceived,
             callAccepted,
+            localID,
+            remoteID,
             startCSR,
             callCSR,
             endCall,

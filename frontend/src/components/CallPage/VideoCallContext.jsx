@@ -18,6 +18,7 @@ const VideoCallProvider = ({ userType, children }) => {
     const remoteVideoRef = useRef();
     const [profileInfo, setProfileInfo] = useState({});
     const [iceCandidateQueue, setIceCandidateQueue] = useState([]);
+    const [calling, setCalling] = useState(false); // New state for calling
 
     const encryptEmail = (email) => {
         const salt = CryptoJS.lib.WordArray.random(16).toString(CryptoJS.enc.Hex);
@@ -111,6 +112,7 @@ const VideoCallProvider = ({ userType, children }) => {
     useSubscription(`/user/${localID}/topic/connectedCSR`, (message) => {
         const csrID = message.body;
         console.log('Connected to CSR:', csrID);
+        setRemoteID(csrID);
         handleConnectedCSR();
     });
 
@@ -224,6 +226,7 @@ const VideoCallProvider = ({ userType, children }) => {
 
     const handleOffer = async (offer, callerID) => {
         setCallAccepted(true);
+        setCalling(false);
 
         console.log('Handling offer:', offer);
     
@@ -340,6 +343,7 @@ const VideoCallProvider = ({ userType, children }) => {
         setCallReceived(false);
         setCallAccepted(false);
         setJoinedQueue(false);
+        setCalling(false);
 
         console.log('Ending call');
         if (localPeer) {
@@ -389,6 +393,7 @@ const VideoCallProvider = ({ userType, children }) => {
     };
 
     const callCSR = async () => {
+        setCalling(true);
         console.log('Calling CSR');
         client.publish({
             destination: "/app/callCSR",
@@ -417,13 +422,14 @@ const VideoCallProvider = ({ userType, children }) => {
             callReceived,
             callAccepted,
             joinedQueue,
+            calling,
             localID,
             remoteID,
             startCSR,
             callCSR,
             endCall,
             rejectCall,
-            handleIncomingCall
+            handleIncomingCall,
         }}>
             {children}
         </VideoCallContext.Provider>

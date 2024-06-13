@@ -2,7 +2,7 @@ import React, { useContext, useCallback } from 'react';
 import { Dialog, DialogActions, DialogTitle, Button, Typography } from '@mui/material';
 import { styled } from '@mui/system';
 import { VideoCallContext } from './VideoCallContext';
-import { PhoneInTalk, CallEnd } from '@mui/icons-material';
+import { PhoneInTalk, CallEnd, Cancel } from '@mui/icons-material'; // Import Cancel icon
 
 const StyledDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialog-paper': {
@@ -23,7 +23,8 @@ const CallNotifications = () => {
         handleIncomingCall,
         rejectCall,
         callReceived,
-        callAccepted
+        callAccepted,
+        calling,
     } = useContext(VideoCallContext);
 
     const memoizedHandleIncomingCall = useCallback(() => {
@@ -34,22 +35,41 @@ const CallNotifications = () => {
         rejectCall();
     }, [rejectCall]);
 
+    const cancelCall = () => {
+        rejectCall();
+    };
+
     return (
-        <StyledDialog
-            open={callReceived && !callAccepted}
-            onClose={memoizedRejectCall}>
-            <DialogTitle>
-                <TitleText>Incoming Call</TitleText>
-            </DialogTitle>
-            <DialogActions>
-                <Button onClick={memoizedHandleIncomingCall} color="primary" variant="contained" startIcon={<PhoneInTalk />}>
-                    Accept
-                </Button>
-                <Button onClick={memoizedRejectCall} color="secondary" variant="contained" startIcon={<CallEnd />}>
-                    Reject
-                </Button>
-            </DialogActions>
-        </StyledDialog>
+        <>
+            <StyledDialog
+                open={callReceived && !callAccepted}
+                onClose={memoizedRejectCall}>
+                <DialogTitle>
+                    <TitleText>Incoming Call</TitleText>
+                </DialogTitle>
+                <DialogActions>
+                    <Button onClick={memoizedHandleIncomingCall} color="primary" variant="contained" startIcon={<PhoneInTalk />}>
+                        Accept
+                    </Button>
+                    <Button onClick={memoizedRejectCall} color="secondary" variant="contained" startIcon={<CallEnd />}>
+                        Reject
+                    </Button>
+                </DialogActions>
+            </StyledDialog>
+
+            <StyledDialog
+                open={calling && !callAccepted}
+                onClose={cancelCall}>
+                <DialogTitle>
+                    <TitleText>Calling CSR...</TitleText>
+                </DialogTitle>
+                <DialogActions>
+                    <Button onClick={cancelCall} color="secondary" variant="contained" startIcon={<Cancel />}>
+                        Cancel Call
+                    </Button>
+                </DialogActions>
+            </StyledDialog>
+        </>
     );
 }
 

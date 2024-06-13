@@ -1,3 +1,4 @@
+/* Navbar.css */
 nav {
     position: fixed;
     top: 0;
@@ -7,8 +8,24 @@ nav {
     color: white;
     padding: 1rem;
     z-index: 1000; /* Ensure it's on top of other content */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    padding: 0 1rem;
+    font-size: 1.1rem;
+}
+
+nav a:hover {
+    color: #ff9800;
 }
 
 body {
     padding-top: 60px; /* Adjust based on the height of your navbar */
+    font-family: 'Arial', sans-serif; /* Use a clean, modern font */
 }

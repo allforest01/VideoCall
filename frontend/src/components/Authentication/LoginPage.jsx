@@ -1,6 +1,7 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserService from "../UsersPage/UserService";
+import './LoginPage.css';
 
 function LoginPage() {
     const [email, setEmail] = useState("");
@@ -29,18 +30,24 @@ function LoginPage() {
     }
 
     return (
-        <div className="auth-container">
-            <h2>Login</h2>
+        <div className="login-page">
+            <h1>Login</h1>
             {error && <p className="error-message">{error}</p>}
             <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Email: </label>
-                    <input type="email" value={email} onChange={e => setEmail(e.target.value)} />
-                </div>
-                <div>
-                    <label>Password: </label>
-                    <input type="password" value={password} onChange={e => setPassword(e.target.value)} />
-                </div>
+                <input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    required
+                />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    required
+                />
                 <button type="submit">Login</button>
             </form>
         </div>

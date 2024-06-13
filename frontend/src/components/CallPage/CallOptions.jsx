@@ -38,7 +38,6 @@ const CallOptions = ({ userType, children }) => {
     const {
         localStream,
         callAccepted,
-        callEnded,
         startCSR,
         callCSR,
         endCall
@@ -63,7 +62,7 @@ const CallOptions = ({ userType, children }) => {
                     <StyledGridContainer container>
                         <Grid item xs={12} md={6}>
                             <StyledPadding>
-                                {localStream && callAccepted && !callEnded && (
+                                {localStream && callAccepted && (
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                         <Button variant="contained" color="primary" onClick={toggleVideo}>Toggle Video</Button>
                                         <Button variant="contained" color="primary" onClick={toggleAudio}>Toggle Audio</Button>
@@ -71,7 +70,7 @@ const CallOptions = ({ userType, children }) => {
                                 )}
                             </StyledPadding>
                             <StyledPadding>
-                                {callAccepted && !callEnded ? (
+                                {callAccepted ? (
                                     <Button
                                         variant="contained" color="secondary"
                                         startIcon={<PhoneDisabled fontSize="large" />} fullWidth

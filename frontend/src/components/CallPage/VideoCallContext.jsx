@@ -8,7 +8,7 @@ const VideoCallProvider = ({ userType, children }) => {
     const client = useStompClient();
     const [callReceived, setCallReceived] = useState(false);
     const [callAccepted, setCallAccepted] = useState(false);
-    const [callEnded, setCallEnded] = useState(false);
+    // const [callEnded, setCallEnded] = useState(true);
     const [localStream, setLocalStream] = useState(null);
     const [localPeer, setLocalPeer] = useState(null);
     const [localID, setLocalID] = useState('');
@@ -102,6 +102,11 @@ const VideoCallProvider = ({ userType, children }) => {
 
     useSubscription(`/user/${localID}/topic/noCSRAvailable`, (message) => {
         handleNoCSRAvailable();
+    });
+
+    useSubscription(`/user/${localID}/topic/callRejected`, (message) => {
+        const rejectingUser = message.body;
+        handleCallRejected(rejectingUser);
     });
 
     useSubscription(`/user/${localID}/topic/connectedCSR`, (message) => {
@@ -203,6 +208,11 @@ const VideoCallProvider = ({ userType, children }) => {
 
     const handleNoCSRAvailable = () => {
         alert("No CSR available at the moment. Please try again later.");
+        handleEndCall();
+    };
+
+    const handleCallRejected = (rejectingUser) => {
+        alert(`Call was rejected by ${rejectingUser}`);
         handleEndCall();
     };
 
@@ -324,18 +334,22 @@ const VideoCallProvider = ({ userType, children }) => {
     };
 
     const handleEndCall = () => {
-        setCallEnded(true);
+
+        setCallReceived(false);
+        setCallAccepted(false);
+        // setCallEnded(true);
 
         console.log('Ending call');
         if (localPeer) {
             localPeer.close();
-            setLocalPeer(new RTCPeerConnection({
-                iceServers: [
-                    {
-                        urls: "stun:stun.l.google.com:19302"
-                    }
-                ]
-            }));
+            // setLocalPeer(new RTCPeerConnection({
+            //     iceServers: [
+            //         {
+            //             urls: "stun:stun.l.google.com:19302"
+            //         }
+            //     ]
+            // }));
+            setLocalPeer(null);
         }
 
         if (localStream) {
@@ -345,10 +359,12 @@ const VideoCallProvider = ({ userType, children }) => {
 
         if (localVideoRef.current) {
             localVideoRef.current.srcObject = null;
+            localVideoRef.current = null;
         }
 
         if (remoteVideoRef.current) {
             remoteVideoRef.current.srcObject = null;
+            remoteVideoRef.current = null;
         }
 
         setRemoteID('');
@@ -390,6 +406,17 @@ const VideoCallProvider = ({ userType, children }) => {
         });
     };
 
+    const rejectCall = () => {
+        client.publish({
+            destination: "/app/rejectCall",
+            body: JSON.stringify({
+                fromUser: localID,
+                toUser: remoteID
+            })
+        });
+        handleEndCall();
+    };
+
     return (
         <VideoCallContext.Provider value={{
             localVideoRef,
@@ -397,10 +424,10 @@ const VideoCallProvider = ({ userType, children }) => {
             localStream,
             callReceived,
             callAccepted,
-            callEnded,
             startCSR,
             callCSR,
             endCall,
+            rejectCall,
             handleIncomingCall
         }}>
             {children}

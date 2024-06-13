@@ -50,6 +50,16 @@ public class WebSocketController {
         }
     }
 
+    @MessageMapping("/rejectCall")
+    public void rejectCall(String rejectMessage) {
+        JSONObject jsonObject = new JSONObject(rejectMessage);
+        String fromUser = jsonObject.getString("fromUser");
+        String toUser = jsonObject.getString("toUser");
+        System.out.println("Call rejected!");
+        simpMessagingTemplate.convertAndSendToUser(toUser, "/topic/callRejected", fromUser);
+        System.out.println("Rejection notification sent to: " + toUser);
+    }
+
     @MessageMapping("/offer")
     public void offer(String offerMessage) {
         System.out.println("Offer message received: " + offerMessage);

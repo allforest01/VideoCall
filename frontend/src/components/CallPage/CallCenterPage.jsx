@@ -8,7 +8,7 @@ import VideoPlayer from './VideoPlayer';
 import CallOptions from './CallOptions';
 import CallNotifications from './CallNotifications';
 
-const SERVER_STOMP_URL = 'https://192.168.102.151:8444/websocket';
+const SERVER_STOMP_URL = 'https://localhost:8444/websocket';
 
 const Wrapper = styled('div')({
     display: "flex",

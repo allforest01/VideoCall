@@ -8,7 +8,7 @@
         <version>3.0.6</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.example</groupId>
+    <groupId>com.allforest01</groupId>
     <artifactId>SignalingServer</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>SignalingServer</name>
@@ -41,8 +41,10 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.allforest01.SignalingServer.SignalingServerApplication</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>
-
 </project>

@@ -1,0 +1,46 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345678
+      MYSQL_DATABASE: user_management
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root --password=12345678 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  signalingserver:
+    build:
+      context: ./backend/SignalingServer
+    ports:
+      - "8444:8444"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+
+  usermanagement:
+    build:
+      context: ./backend/UserManagement
+    ports:
+      - "8443:8443"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SECRET_STRING=a56e7646743bb2ac81a93ef7275490c284e9d291722e75443a24e097fdb3db73668756af93a65fa6ebd3334009ee37351fb9012d5f1
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - HTTPS=true
+      - SSL_CRT_FILE=/app/certs/server.crt
+      - SSL_KEY_FILE=/app/certs/server.key
+    volumes:
+      - ./frontend/certs:/app/certs

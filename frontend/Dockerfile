@@ -10,12 +10,6 @@ COPY package*.json ./
 # Clean npm cache and install dependencies
 RUN npm cache clean --force && npm install
 
-# Copy the rest of the application code
-COPY . .
-
-# Copy SSL certificates
-COPY ./certs /app/certs
-
 # Expose the port the app runs on
 EXPOSE 3000
 

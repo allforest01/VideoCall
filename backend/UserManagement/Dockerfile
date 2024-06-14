@@ -1,20 +1,20 @@
 # Use a Java development kit (JDK) as base image
 FROM openjdk:17-slim
 
-# Install curl
-RUN apt-get update && apt-get install -y curl
+# Install curl and Maven
+RUN apt-get update && apt-get install -y curl maven
 
 # Set the working directory
 WORKDIR /app
 
-# Copy the project files
-COPY . .
+# Copy Maven wrapper files to the container
+COPY mvnw mvnw
+COPY .mvn .mvn
 
-# Package the application
-RUN ./mvnw package -DskipTests
+# Copy pom.xml to the container
+COPY pom.xml .
 
-# Rename the JAR file
-RUN mv target/UserManagement-0.0.1-SNAPSHOT.jar target/UserManagement.jar
+# Install Maven dependencies (this will leverage Docker cache)
+RUN ./mvnw dependency:go-offline
 
-# Run the application
-CMD ["java", "-jar", "target/UserManagement.jar"]
+# The source code will be mounted by docker-compose, so no need to copy it here

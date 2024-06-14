@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// import { Typography, AppBar, Toolbar } from '@mui/material';
 import { styled } from '@mui/system';
 import { StompSessionProvider } from 'react-stomp-hooks';
 import { VideoCallProvider } from './VideoCallContext';
@@ -14,10 +13,12 @@ const Wrapper = styled('div')({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
+    justifyContent: "center",
     width: "100%",
-    height: "100vh",
-    position: "relative",
+    height: "calc(100vh - 60px)", // Subtract navbar height
     backgroundColor: "#f0f0f0",
+    overflow: "hidden", // Ensure no scrolling
+    position: "relative",
 });
 
 function CallCenterPage() {

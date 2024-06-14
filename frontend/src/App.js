@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Navbar from './components/Common/Navbar';
 import LoginPage from './components/Authentication/LoginPage';
 import RegistrationPage from './components/Authentication/RegistrationPage';
-// import FooterComponent from './components/Common/Footer';
 import UserService from './components/UsersPage/UserService';
 import UpdateUser from './components/UsersPage/UpdateUser';
 import ProfilePage from './components/UsersPage/ProfilePage';
@@ -30,10 +29,9 @@ function App() {
                                 <Route path="/update-user/:userId" element={<UpdateUser />} />
                             </>
                         )}
-                        <Route path="*" element={<Navigate to="/login" />} />‰
+                        <Route path="*" element={<Navigate to="/login" />} />
                     </Routes>
                 </div>
-                {/* <FooterComponent /> */}
             </div>
         </BrowserRouter>
     );

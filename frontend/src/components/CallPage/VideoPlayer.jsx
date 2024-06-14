@@ -4,15 +4,15 @@ import { VideoCallContext } from './VideoCallContext';
 
 const VideoWrapper = styled('div')({
     width: '80%',
-    height: 'calc(100vh - 100px)',
+    height: 'calc(100vh - 150px)', // Adjusted height to fit controls
     position: 'relative',
     backgroundColor: '#000',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
     border: '5px solid #fff', // Add border for visibility
     borderRadius: '10px',
-    overflow: 'hidden',
 });
 
 const StyledVideo = styled('video')({
